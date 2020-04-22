@@ -37,6 +37,7 @@ class WaterAI extends AIController
 //			pathfinder.InitializePath([AIMap.GetTileIndex(216, 214)], [AIMap.GetTileIndex(87, 195)], [AIMap.GetTileIndex(216, 213), AIMap.GetTileIndex(86, 195)]);
 //			pathfinder.InitializePath([AIMap.GetTileIndex(176, 89)], [AIMap.GetTileIndex(134, 77)], [AIMap.GetTileIndex(134, 78), AIMap.GetTileIndex(177, 89)]);
 //			pathfinder.InitializePath([[AIMap.GetTileIndex(176, 89), AIMap.GetTileIndex(177, 89)]], [[AIMap.GetTileIndex(134, 77), AIMap.GetTileIndex(134, 78)]]);
+//			pathfinder.InitializePath([AIMap.GetTileIndex(108, 144)], [AIMap.GetTileIndex(170, 59)], [AIMap.GetTileIndex(109, 144), AIMap.GetTileIndex(170, 58)]);
 			pathfinder.InitializePath([[AIMap.GetTileIndex(108, 144), AIMap.GetTileIndex(109, 144)]], [[AIMap.GetTileIndex(170, 59), AIMap.GetTileIndex(170, 58)]]);
 			local tick = AIController.GetTick();
 			local date = AIDate.GetCurrentDate();

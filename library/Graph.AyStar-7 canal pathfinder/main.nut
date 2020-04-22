@@ -4,7 +4,7 @@
  */
 class AyStar
 {
-	_queue_class = import("queue.native_heap", "", 1);
+	_queue_class = import("queue.priority_queue", "", 3);
 	_pf_instance = null;
 	_cost_callback = null;
 	_estimate_callback = null;
