@@ -19,14 +19,14 @@ class WaterAI extends AIController
 			local name_b = connection.tostring() + "B";
 			local dock_a = BuildDocks(name_a);
 			local dock_b = BuildDocks(name_b);
-//			local built_a = dock_a[1];
-//			local built_b = dock_b[1];
-			local built_a = dock_a[2];
-			local built_b = dock_b[2];
-//			AILog.Info("water_tile1 = " + dock_a[0]);
-//			AILog.Info("water_tile2 = " + dock_b[0]);
-			AILog.Info("water_tile1 = " + dock_a[0] + "; water_tile1_exit = " + dock_a[1]);
-			AILog.Info("water_tile2 = " + dock_b[0] + "; water_tile2_exit = " + dock_a[1]);
+			local built_a = dock_a[1];
+			local built_b = dock_b[1];
+//			local built_a = dock_a[2];
+//			local built_b = dock_b[2];
+			AILog.Info("water_tile1 = " + dock_a[0]);
+			AILog.Info("water_tile2 = " + dock_b[0]);
+//			AILog.Info("water_tile1 = " + dock_a[0] + "; water_tile1_exit = " + dock_a[1]);
+//			AILog.Info("water_tile2 = " + dock_b[0] + "; water_tile2_exit = " + dock_a[1]);
 */
 			local pathfinder = CanalPathFinder();
 			pathfinder.cost.max_aqueduct_length = AIGameSettings().GetValue("max_bridge_length") + 2;
@@ -37,7 +37,8 @@ class WaterAI extends AIController
 //			pathfinder.InitializePath([AIMap.GetTileIndex(216, 214)], [AIMap.GetTileIndex(87, 195)], [AIMap.GetTileIndex(216, 213), AIMap.GetTileIndex(86, 195)]);
 //			pathfinder.InitializePath([AIMap.GetTileIndex(176, 89)], [AIMap.GetTileIndex(134, 77)], [AIMap.GetTileIndex(134, 78), AIMap.GetTileIndex(177, 89)]);
 //			pathfinder.InitializePath([[AIMap.GetTileIndex(176, 89), AIMap.GetTileIndex(177, 89)]], [[AIMap.GetTileIndex(134, 77), AIMap.GetTileIndex(134, 78)]]);
-			pathfinder.InitializePath([[AIMap.GetTileIndex(108, 144), AIMap.GetTileIndex(109, 144)]], [[AIMap.GetTileIndex(170, 59), AIMap.GetTileIndex(170, 58)]]);
+			pathfinder.InitializePath([AIMap.GetTileIndex(108, 144)], [AIMap.GetTileIndex(170, 59)], [AIMap.GetTileIndex(109, 144), AIMap.GetTileIndex(170, 58)]);
+//			pathfinder.InitializePath([[AIMap.GetTileIndex(108, 144), AIMap.GetTileIndex(109, 144)]], [[AIMap.GetTileIndex(170, 59), AIMap.GetTileIndex(170, 58)]]);
 			local tick = AIController.GetTick();
 			local date = AIDate.GetCurrentDate();
 			local path = pathfinder.FindPath(-1);
@@ -63,8 +64,8 @@ class WaterAI extends AIController
 				local paths = [path];
 				for (local i = 0; i < paths.len(); i++) {
 					path = paths[i];
-//					local tile_list = BuildPath(path, connection);
-					local tile_list = BuildPathOld(path, connection);
+					local tile_list = BuildPath(path, connection);
+//					local tile_list = BuildPathOld(path, connection);
 					AIController.Break("Path built!");
 					local built_depot = false;
 					if (build_depots) {
