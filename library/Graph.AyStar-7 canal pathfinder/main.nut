@@ -144,7 +144,7 @@ function AyStar::FindPath(iterations)
 			/* New entry, make sure we don't check it again */
 			this._closed.AddItem(cur_tile, direction);
 		}
-		
+
 		/* Check if we found the end */
 		foreach (goal in this._goals) {
 			if (cur_tile == goal) {
@@ -164,14 +164,14 @@ function AyStar::FindPath(iterations)
 			if (node[1] <= 0) throw("directional value should never be zero or negative.");
 
 			if (this._closed.GetValue(node[0]) & node[1]) continue;
-			
+
 			if (!node[2].IsEmpty()) {
 				local used_tiles = AITileList();
 				used_tiles.AddList(path._used_tiles);
 				used_tiles.KeepList(node[2]);
 				if (!used_tiles.IsEmpty()) continue;
 			}
-			
+
 			/* Calculate the new paths and add them to the open list */
 			local new_path = this.Path(path, node[0], node[1], node[2], this._cost_callback, this._pf_instance);
 			this._open.Insert(new_path, new_path._cost + this._estimate_callback(this._pf_instance, node[0], node[1], this._goals));
@@ -234,7 +234,7 @@ class AyStar.Path
 	 * Return the cost of this (partial-)path from the beginning up to this node.
 	 */
 	function GetCost() { return this._cost; }
-	
+
 	/**
 	 * Return the list of tiles that have been marked as used from the beginning up to to this node.
 	 */

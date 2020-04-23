@@ -9,7 +9,7 @@ class Canal
 	_cost_no_existing_water = null; ///< The cost that is added to _cost_tile if no water exists yet.
 	_cost_diagonal_tile = null;     ///< The cost for walking a diagonal tile.
 	_cost_turn45 = null;            ///< The cost that is added to _cost_tile if the direction changes 45 degrees.
-	_cost_turn90 = null;            ///< The cost that is added to _cost_tile if the direction changes 90 degrees. 
+	_cost_turn90 = null;            ///< The cost that is added to _cost_tile if the direction changes 90 degrees.
 	_cost_aqueduct_per_tile = null; ///< The cost per tile of a new aqueduct, this is added to _cost_tile.
 	_cost_lock = null;              ///< The cost for a new lock, this is added to _cost_tile.
 	_cost_depot = null;             ///< The cost for an existing depot, this is added to _cost_tile.
@@ -251,7 +251,7 @@ function Canal::_Cost(self, path, new_tile, new_direction)
 //		AILog.Info("Check for a 45 degrees turn, Before: " + (path.GetCost() + cost) + " After: " + (path.GetCost() + cost + self._cost_turn45));
 		cost += self._cost_turn45;
 	}
-	
+
 	/* Chek for a 90 degrees turn */
 	if (path.GetParent() != null && path.GetParent().GetParent() != null &&
 			new_tile - prev_tile == path.GetParent().GetParent().GetTile() - path.GetParent().GetTile()) {
@@ -295,36 +295,36 @@ function Canal::_Neighbours(self, path, cur_node)
 		local next_tile = cur_node + (cur_node - other_end) / AIMap.DistanceManhattan(cur_node, other_end);
 		if (self._IsGoalTile(next_tile) || AIMarine.AreWaterTilesConnected(cur_node, next_tile) || AIMarine.BuildCanal(next_tile) || self._CanBuildAqueduct(cur_node, next_tile) || AITile.HasTransportType(next_tile, AITile.TRANSPORT_WATER) && (!AITile.IsWaterTile(next_tile) || AIMarine.IsCanalTile(next_tile) || self._IsLockEntryExit(next_tile) && self._CanConnectToLock(cur_node, next_tile) || AIMarine.IsWaterDepotTile(next_tile) && self._CanConnectToDepot(cur_node, next_tile))) {
 			tiles.push([next_tile, self._GetDirection(cur_node, next_tile, false), AITileList()]);
-//			AILog.Info(cur_node + "; 1. Aqueduct detected, pushed next_tile = " + next_tile + "; parent_tile = " + path.GetParent().GetTile());
+//			AILog.Info(cur_node + "; 1. Aqueduct detected, pushed next_tile = " + next_tile + "; parent_tile = " + (path.GetParent() == null ? "null" : path.GetParent().GetTile()));
 //			AIController.Sleep(74);
 		}
 		/* The other end of the aqueduct is a neighbour. */
 		tiles.push([other_end, self._GetDirection(next_tile, cur_node, true), AITileList()]);
-//		AILog.Info(cur_node + "; 1. Aqueduct detected, pushed other_end = " + other_end + "; parent_tile = " + path.GetParent().GetTile());
+//		AILog.Info(cur_node + "; 1. Aqueduct detected, pushed other_end = " + other_end + "; parent_tile = " + (path.GetParent() == null ? "null" : path.GetParent().GetTile()));
 //		AIController.Sleep(74);
 	} else if (self._IsLockEntryExit(cur_node)) {
 		local other_end = self._GetOtherLockEnd(cur_node);
 		local next_tile = cur_node + (cur_node - other_end) / AIMap.DistanceManhattan(cur_node, other_end);
 		if (self._IsGoalTile(next_tile) || AIMarine.AreWaterTilesConnected(cur_node, next_tile) || AIMarine.BuildCanal(next_tile) || self._CanBuildAqueduct(cur_node, next_tile) || AITile.HasTransportType(next_tile, AITile.TRANSPORT_WATER) && (!AITile.IsWaterTile(next_tile) || AIMarine.IsCanalTile(next_tile) || self._IsLockEntryExit(next_tile) && self._CanConnectToLock(cur_node, next_tile) || AIMarine.IsWaterDepotTile(next_tile) && self._CanConnectToDepot(cur_node, next_tile))) {
 			tiles.push([next_tile, self._GetDirection(cur_node, next_tile, false), AITileList()]);
-//			AILog.Info(cur_node + "; 1. Lock detected, pushed next_tile = " + next_tile + "; parent_tile = " + path.GetParent().GetTile());
+//			AILog.Info(cur_node + "; 1. Lock detected, pushed next_tile = " + next_tile + "; parent_tile = " + (path.GetParent() == null ? "null" : path.GetParent().GetTile()));
 //			AIController.Sleep(74);
 		}
 		/* The other end of the lock is a neighbour. */
 		tiles.push([other_end, self._GetDirection(next_tile, cur_node, false), AITileList()]);
-//		AILog.Info(cur_node + "; 1. Lock detected, pushed other_end = " + other_end + "; parent_tile = " + path.GetParent().GetTile());
+//		AILog.Info(cur_node + "; 1. Lock detected, pushed other_end = " + other_end + "; parent_tile = " + (path.GetParent() == null ? "null" : path.GetParent().GetTile()));
 //		AIController.Sleep(74);
 	} else if (AIMarine.IsWaterDepotTile(cur_node)) {
 		local other_end = self._GetOtherDepotTile(cur_node);
 		local next_tile = cur_node + (cur_node - other_end) / AIMap.DistanceManhattan(cur_node, other_end);
 		if (self._IsGoalTile(next_tile) || AIMarine.AreWaterTilesConnected(cur_node, next_tile) || AIMarine.BuildCanal(next_tile) || self._CanBuildAqueduct(cur_node, next_tile) || AITile.HasTransportType(next_tile, AITile.TRANSPORT_WATER) && (!AITile.IsWaterTile(next_tile) || AIMarine.IsCanalTile(next_tile) || self._IsLockEntryExit(next_tile) && self._CanConnectToLock(cur_node, next_tile) || AIMarine.IsWaterDepotTile(next_tile) && self._CanConnectToDepot(cur_node, next_tile))) {
 			tiles.push([next_tile, self._GetDirection(cur_node, next_tile, false), AITileList()]);
-//			AILog.Info(cur_node + "; 1. Depot detected, pushed next_tile = " + next_tile + "; parent_tile = " + path.GetParent().GetTile());
+//			AILog.Info(cur_node + "; 1. Depot detected, pushed next_tile = " + next_tile + "; parent_tile = " + (path.GetParent() == null ? "null" : path.GetParent().GetTile()));
 //			AIController.Sleep(74);
 		}
 		/* The other end of the depot is a neighbour. */
 		tiles.push([other_end, self._GetDirection(next_tile, cur_node, false), AITileList()]);
-//		AILog.Info(cur_node + "; 1. Depot detected, pushed other_end = " + other_end + "; parent_tile = " + path.GetParent().GetTile());
+//		AILog.Info(cur_node + "; 1. Depot detected, pushed other_end = " + other_end + "; parent_tile = " + (path.GetParent() == null ? "null" : path.GetParent().GetTile()));
 //		AIController.Sleep(74);
 	} else if (path.GetParent() != null && AIMap.DistanceManhattan(cur_node, path.GetParent().GetTile()) == 2 && self._IsFlatTile(cur_node)) {
 		local other_end = path.GetParent().GetTile();
@@ -358,15 +358,15 @@ function Canal::_Neighbours(self, path, cur_node)
 			if ((path.GetParent() == null || AIMarine.AreWaterTilesConnected(path.GetParent().GetTile(), cur_node) || AIMarine.BuildCanal(cur_node) || AITile.HasTransportType(cur_node, AITile.TRANSPORT_WATER)) &&
 					(self._IsGoalTile(next_tile) || AIMarine.AreWaterTilesConnected(cur_node, next_tile) && (!self._IsAqueductTile(next_tile) || self._CanConnectToAqueduct(cur_node, next_tile)) || AIMarine.BuildCanal(next_tile) || self._CanBuildAqueduct(cur_node, next_tile) || AITile.HasTransportType(next_tile, AITile.TRANSPORT_WATER) && (!AITile.IsWaterTile(next_tile) && !AITile.IsCoastTile(next_tile) && !self._IsAqueductTile(next_tile) || AIMarine.IsCanalTile(next_tile) || self._IsLockEntryExit(next_tile) && self._CanConnectToLock(cur_node, next_tile) || AIMarine.IsWaterDepotTile(next_tile) && self._CanConnectToDepot(cur_node, next_tile) || self._IsAqueductTile(next_tile) && self._CanConnectToAqueduct(cur_node, next_tile)))) {
 				tiles.push([next_tile, self._GetDirection(cur_node, next_tile, false), AITileList()]);
-//				AILog.Info(cur_node + "; 3. Build Canal, pushed next_tile = " + next_tile + "; parent_tile = " + path.GetParent().GetTile());
+//				AILog.Info(cur_node + "; 3. Build Canal, pushed next_tile = " + next_tile + "; parent_tile = " + (path.GetParent() == null ? "null" : path.GetParent().GetTile()));
 //				AIController.Sleep(74);
 			}
 		}
 		if (path.GetParent() != null) {
 			local aqueduct = self._GetAqueduct(path.GetParent().GetTile(), cur_node, self._GetDirection(path.GetParent().GetTile(), cur_node, true));
-			foreach (tile in aqueduct) {
-				tiles.push(tile);
-//				AILog.Info(cur_node + "; 4. Build Aqueduct, pushed tile = " + tile[0] + "; parent_tile = " + path.GetParent().GetTile());
+			if (aqueduct.len()) {
+				tiles.push(aqueduct);
+//				AILog.Info(cur_node + "; 4. Build Aqueduct, pushed aqueduct = " + aqueduct[0] + "; parent_tile = " + path.GetParent().GetTile());
 //				AIController.Sleep(74);
 			}
 			foreach (offset in offsets) {
@@ -412,6 +412,17 @@ function Canal::_GetDirection(from, to, is_aqueduct)
 	return 1 << (4 + this._dir(from, to));
 }
 
+function Canal::_GetDirectionOld(pre_from, from, to, is_aqueduct)
+{
+	if (is_aqueduct) {
+		if (from - to == 1) return 1;
+		if (from - to == -1) return 2;
+		if (from - to == AIMap.GetMapSizeX()) return 4;
+		if (from - to == -AIMap.GetMapSizeX()) return 8;
+	}
+	return 1 << (4 + (pre_from == null ? 0 : 4 * this._dir(pre_from, from)) + this._dir(from, to));
+}
+
 function Canal::_GetUsedTiles(from, to, is_aqueduct)
 {
 	local used_list = AITileList();
@@ -432,10 +443,7 @@ function Canal::_GetUsedTiles(from, to, is_aqueduct)
 		used_list.AddTile(tile_offset);
 		tile_offset += offset;
 	}
-	
-//	for (local tile = used_list.Begin(); !used_list.IsEnd(); tile = used_list.Next()) {
-//		AILog.Info("from = " + from + "; to = " + to + "; tile = " + tile);
-//	}
+
 	return used_list;
 }
 
@@ -445,18 +453,19 @@ function Canal::_GetUsedTiles(from, to, is_aqueduct)
  */
 function Canal::_GetAqueduct(last_node, cur_node, aqueduct_dir)
 {
-	local tiles = [];
-	if (!this._IsInclinedTile(cur_node)) return tiles;
+	if (!this._IsInclinedTile(cur_node)) return [];
 
 	for (local i = 1; i < this._max_aqueduct_length; i++) {
-		local target = cur_node + i * (cur_node - last_node);
-		if (AIBridge.BuildBridge(AIVehicle.VT_WATER, 0, cur_node, target)) {
-			tiles.push([target, aqueduct_dir, AITileList()]);
-			break;
+		local next_tile = cur_node + i * (cur_node - last_node);
+		if (!AIMap.IsValidTile(next_tile)) {
+			return [];
+		}
+		if (AIBridge.BuildBridge(AIVehicle.VT_WATER, 0, cur_node, next_tile)) {
+			return [next_tile, aqueduct_dir, AITileList()];
 		}
 	}
 
-	return tiles;
+	return [];
 }
 
 function Canal::_CanBuildAqueduct(last_node, cur_node)
@@ -465,8 +474,13 @@ function Canal::_CanBuildAqueduct(last_node, cur_node)
 	if (AIBridge.IsBridgeTile(cur_node)) return false;
 
 	for (local i = 1; i < this._max_aqueduct_length; i++) {
-		local target = cur_node + i * (cur_node - last_node);
-		if (AIBridge.BuildBridge(AIVehicle.VT_WATER, 0, cur_node, target)) return true;
+		local next_tile = cur_node + i * (cur_node - last_node);
+		if (!AIMap.IsValidTile(next_tile)) {
+			return false;
+		}
+		if (AIBridge.BuildBridge(AIVehicle.VT_WATER, 0, cur_node, next_tile)) {
+			return true;
+		}
 	}
 
 	return false;
@@ -475,7 +489,7 @@ function Canal::_CanBuildAqueduct(last_node, cur_node)
 function Canal::_CanConnectToAqueduct(prev_tile, aqueduct_tile)
 {
 	assert(this._IsAqueductTile(aqueduct_tile));
-	
+
 	local slope = AITile.GetSlope(aqueduct_tile);
 	local offset;
 	if (slope == AITile.SLOPE_NE) {
@@ -487,7 +501,7 @@ function Canal::_CanConnectToAqueduct(prev_tile, aqueduct_tile)
 	} else if (slope == AITile.SLOPE_SW) {
 		offset = AIMap.GetTileIndex(1, 0);
 	}
-	
+
 	return prev_tile == aqueduct_tile + offset;
 }
 
@@ -500,7 +514,7 @@ function Canal::_CheckAqueductSlopes(tile_a, tile_b)
 {
 	local slope_a = AITile.GetSlope(tile_a);
 	if (AIMap.DistanceManhattan(tile_a, tile_b) != 1) return false;
-    if (!this._IsInclinedTile(tile_a) || !this._IsInclinedTile(tile_b)) return false;
+	if (!this._IsInclinedTile(tile_a) || !this._IsInclinedTile(tile_b)) return false;
 
 	local slope_a = AITile.GetSlope(tile_a);
 	if (AITile.GetComplementSlope(slope_a) != AITile.GetSlope(tile_b)) return false;
@@ -638,7 +652,7 @@ function Canal::_CheckLockDirection(prev_tile, middle_tile)
 function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 {
 	assert(this._IsInclinedTile(middle_tile));
-	
+
 	local offset_mid;
 	local offset_side;
 	if (AIMap.GetTileY(prev_tile) != AIMap.GetTileY(middle_tile)) {
@@ -648,7 +662,7 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 		offset_mid = AIMap.GetTileIndex(1, 0);
 		offset_side = AIMap.GetTileIndex(0, 1);
 	}
-	
+
 	/* m = middle, s = side, p = positive, n = negative, 2 = two times */
 	local t_mp = middle_tile + offset_mid;
 	local t_mn = middle_tile - offset_mid;
@@ -664,12 +678,12 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 	local t_2mp_sn = t_2mp - offset_side;
 	local t_2mn_sp = t_2mn + offset_side;
 	local t_2mn_sn = t_2mn - offset_side;
-	
+
 	if (this._IsAqueductTile(t_mp_sp)) return true;
 	if (this._IsAqueductTile(t_mp_sn)) return true;
 	if (this._IsAqueductTile(t_mn_sp)) return true;
 	if (this._IsAqueductTile(t_mn_sn)) return true;
-	
+
 	if (this._IsWaterDockTile(t_mp_sp) && this._GetDockDockingTile(t_mp_sp) == t_mp) return true;
 	if (this._IsWaterDockTile(t_mp_sn) && this._GetDockDockingTile(t_mp_sn) == t_mp) return true;
 	if (this._IsWaterDockTile(t_mn_sp) && this._GetDockDockingTile(t_mn_sp) == t_mn) return true;
@@ -689,7 +703,7 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 		if (this._IsOneCornerRaisedTile(t_mp_sn)) {
 			if (AIMarine.AreWaterTilesConnected(t_mp_sn, t_sn)) return true;
 		}
-	}	
+	}
 
 	if (AIMarine.AreWaterTilesConnected(t_mn, t_mn_sp)) {
 		if (AIMarine.IsWaterDepotTile(t_mn_sp)) return true;
@@ -697,7 +711,7 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 		if (this._IsOneCornerRaisedTile(t_mn_sp)) {
 			if (AIMarine.AreWaterTilesConnected(t_mn_sp, t_sp)) return true;
 		}
-	}	
+	}
 
 	if (AIMarine.AreWaterTilesConnected(t_mn, t_mn_sn)) {
 		if (AIMarine.IsWaterDepotTile(t_mn_sn)) return true;
@@ -724,7 +738,7 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 			if (!AIMarine.AreWaterTilesConnected(t_2mn_sn, t_mn_sn) || !AIMarine.AreWaterTilesConnected(t_2mn_sn, t_2mn)) return true;
 		}
 	}
-	
+
 	if (AIMarine.AreWaterTilesConnected(t_mp, t_mp_sp) && AIMarine.AreWaterTilesConnected(t_mp, t_mp_sn)) {
 		if (!AIMarine.AreWaterTilesConnected(t_mp, t_2mp)) {
 			return true;
@@ -738,7 +752,7 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 			return true;
 		}
 	}
-	
+
 	if (AIMarine.AreWaterTilesConnected(t_mn, t_mn_sp) && AIMarine.AreWaterTilesConnected(t_mn, t_mn_sn)) {
 		if (!AIMarine.AreWaterTilesConnected(t_mn, t_2mn)) {
 			return true;
@@ -752,7 +766,7 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -769,14 +783,14 @@ function Canal::_PreviousLockBlocksConnection(prev_lock, new_lock)
 	local offset_tile2 = prev_lock - offset;
 	local offset_tile3 = new_lock + offset;
 	local offset_tile4 = new_lock - offset;
-	if ((AIMarine.IsLockTile(prev_lock) || 
+	if ((AIMarine.IsLockTile(prev_lock) ||
 			(AIMarine.AreWaterTilesConnected(prev_lock, offset_tile1) || this._IsWaterDockTile(offset_tile1) && this._GetDockDockingTile(offset_tile1) == prev_lock) &&
 			(AIMarine.AreWaterTilesConnected(prev_lock, offset_tile2) || this._IsWaterDockTile(offset_tile2) && this._GetDockDockingTile(offset_tile2) == prev_lock)) &&
 			(AIMarine.AreWaterTilesConnected(new_lock, offset_tile3) || this._IsWaterDockTile(offset_tile3) && this._GetDockDockingTile(offset_tile3) == new_lock) &&
 			(AIMarine.AreWaterTilesConnected(new_lock, offset_tile4) || this._IsWaterDockTile(offset_tile4) && this._GetDockDockingTile(offset_tile4) == new_lock)) {
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -817,7 +831,7 @@ function Canal::_GetDockDockingTile(dock_tile)
 	} else {
 		dock_slope = dock_tile;
 	}
-	
+
 	local slope = AITile.GetSlope(dock_slope);
 	if (slope == AITile.SLOPE_NE) {
 		return dock_slope + AIMap.GetTileIndex(2, 0);
