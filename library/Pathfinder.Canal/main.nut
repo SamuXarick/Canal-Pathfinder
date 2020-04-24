@@ -36,7 +36,7 @@ class Canal
 		this._cost_lock = 925;
 		this._cost_depot = 150;
 		this._max_aqueduct_length = 6;
-		this._pathfinder = this._aystar_class(this, this._Cost, this._Estimate, this._Neighbours, this._CheckDirection);
+		this._pathfinder = this._aystar_class(this, this._Cost, this._Estimate, this._Neighbours);
 
 		this.cost = this.Cost(this);
 		this._running = false;
@@ -377,11 +377,6 @@ function Canal::_Neighbours(self, path, cur_node)
 		}
 	}
 	return tiles;
-}
-
-function Canal::_CheckDirection(self, tile, existing_direction, new_direction)
-{
-	return false;
 }
 
 function Canal::_dir(from, to)
