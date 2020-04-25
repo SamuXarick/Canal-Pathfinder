@@ -5,14 +5,16 @@
 class AyStar
 {
 	_queue_class = import("queue.priority_queue", "", 3);
+//	_queue_class = AIPriorityQueue;
 	_pf_instance = null;
 	_cost_callback = null;
 	_estimate_callback = null;
 	_neighbours_callback = null;
+	_check_direction_callback = null;
 	_open = null;
 	_closed = null;
-//	_source_goal_dist = AIMap.GetMapSizeX() + AIMap.GetMapSizeY();
 	_goals = null;
+//	_source_goal_dist = AIMap.GetMapSizeX() + AIMap.GetMapSizeY();
 
 	/**
 	 * @param pf_instance An instance that'll be used as 'this' for all
@@ -33,18 +35,24 @@ class AyStar
 	 *  from a given node. It should accept three parameters, current_path, node
 	 *  and neighbours_callback_param. It should return an array containing all
 	 *  neighbouring nodes, which are an array in the form [tile, direction].
+	 * @param check_direction_callback A function that returns either false or
+	 *  true. It should accept four parameters, tile, existing_direction,
+	 *  new_direction and check_direction_callback_param. It should check
+	 *  if both directions can go together on a single tile.
 	 */
-	constructor(pf_instance, cost_callback, estimate_callback, neighbours_callback)
+	constructor(pf_instance, cost_callback, estimate_callback, neighbours_callback, check_direction_callback)
 	{
 		if (typeof(pf_instance) != "instance") throw("'pf_instance' has to be an instance.");
 		if (typeof(cost_callback) != "function") throw("'cost_callback' has to be a function-pointer.");
 		if (typeof(estimate_callback) != "function") throw("'estimate_callback' has to be a function-pointer.");
 		if (typeof(neighbours_callback) != "function") throw("'neighbours_callback' has to be a function-pointer.");
+		if (typeof(check_direction_callback) != "function") throw("'check_direction_callback' has to be a function-pointer.");
 
 		this._pf_instance = pf_instance;
 		this._cost_callback = cost_callback;
 		this._estimate_callback = estimate_callback;
 		this._neighbours_callback = neighbours_callback;
+		this._check_direction_callback = check_direction_callback;
 	}
 
 	/**
@@ -156,19 +164,23 @@ function AyStar::FindPath(iterations)
 			if (this._closed.GetValue(node[0]) & node[1]) continue;
 
 			if (!node[2].IsEmpty()) {
-				/* Scan the path for a possible collision with used tiles */
+				/* Scan the path for a possible conflict with used tiles */
 				local scan_path = path._prev;
 
 				local mismatch = false;
-				local used_tiles = AITileList();
+				local conflict_tiles = AIList();
 				while (scan_path != null) {
-					used_tiles.AddList(path._used_tiles);
-					used_tiles.KeepList(node[2]);
-					if (!used_tiles.IsEmpty()) {
-						mismatch = true;
-						break;
+					conflict_tiles.AddList(scan_path._used_tiles);
+					conflict_tiles.KeepList(node[2]);
+					if (!conflict_tiles.IsEmpty()) {
+						for (local conf_tile = conflict_tiles.Begin(); !conflict_tiles.IsEnd(); conf_tile = conflict_tiles.Next()) {
+							if (!this._check_direction_callback(this._pf_instance, conf_tile, scan_path._used_tiles.GetValue(conf_tile), node[2].GetValue(conf_tile))) {
+								mismatch = true;
+								break;
+							}
+						}
 					}
-					used_tiles.Clear();
+					conflict_tiles.Clear();
 					scan_path = scan_path._prev;
 				}
 				if (mismatch) continue;
@@ -212,7 +224,7 @@ class AyStar.Path
 		this._tile = new_tile;
 		this._direction = new_direction;
 		this._cost = cost_callback(pf_instance, old_path, new_tile, new_direction);
-		this._used_tiles = AITileList();
+		this._used_tiles = AIList();
 		this._used_tiles.AddList(used_tiles);
 	};
 
