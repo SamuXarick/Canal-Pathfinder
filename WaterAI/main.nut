@@ -3,6 +3,11 @@ import("pathfinder.canal", "CanalPathFinder", 1);
 class WaterAI extends AIController
 {
 	static offsets = [AIMap.GetTileIndex(1, 0), AIMap.GetTileIndex(0, 1), AIMap.GetTileIndex(-1, 0), AIMap.GetTileIndex(0, -1)];
+	rand = null;
+	
+	constructor() {
+		rand = Rand();
+	}
 
 	function Start()
 	{
@@ -21,20 +26,19 @@ class WaterAI extends AIController
 			local dock_b = BuildDocks(name_b);
 			local built_a = dock_a[1];
 			local built_b = dock_b[1];
-//			local built_a = dock_a[2];
-//			local built_b = dock_b[2];
 			AILog.Info("water_tile1 = " + dock_a[0]);
 			AILog.Info("water_tile2 = " + dock_b[0]);
-//			AILog.Info("water_tile1 = " + dock_a[0] + "; water_tile1_exit = " + dock_a[1]);
-//			AILog.Info("water_tile2 = " + dock_b[0] + "; water_tile2_exit = " + dock_a[1]);
 
 			local pathfinder = CanalPathFinder();
 			pathfinder.cost.max_aqueduct_length = AIGameSettings().GetValue("max_bridge_length") + 2;
 			pathfinder.InitializePath([dock_a[0]], [dock_b[0]]);
 //			pathfinder.InitializePath([[dock_a[0], dock_a[1]]], [[dock_b[0], dock_b[1]]]);
 //			pathfinder.InitializePath([1380], [2596]);
+//			pathfinder.InitializePath([AIMap.GetTileIndex(254, 254)], [AIMap.GetTileIndex(1, 1)]);
+//			pathfinder.InitializePath([0xBFB4], [0x5959], [0x5958, 0xBFB3]);
 //			pathfinder.InitializePath([49076], [22873], [49075, 22872]);
 //			pathfinder.InitializePath([46575], [9786], [46831, 10042]);
+//			pathfinder.InitializePath([0x45D8], [0xD58A], [0xD589, 0X45D9]);
 //			pathfinder.InitializePath([AIMap.GetTileIndex(216, 214)], [AIMap.GetTileIndex(87, 195)], [AIMap.GetTileIndex(216, 213), AIMap.GetTileIndex(86, 195)]);
 //			pathfinder.InitializePath([AIMap.GetTileIndex(176, 89)], [AIMap.GetTileIndex(134, 77)], [AIMap.GetTileIndex(134, 78), AIMap.GetTileIndex(177, 89)]);
 //			pathfinder.InitializePath([[AIMap.GetTileIndex(176, 89), AIMap.GetTileIndex(177, 89)]], [[AIMap.GetTileIndex(134, 77), AIMap.GetTileIndex(134, 78)]]);
@@ -98,26 +102,6 @@ class WaterAI extends AIController
 		}
 	}
 
-	function IsRiverTile(tile)
-	{
-		if (!AITile.IsWaterTile(tile)) return false;
-		if (AITile.GetMaxHeight(tile) == 0) return false;
-		if (AIMarine.IsWaterDepotTile(tile)) return false;
-		if (AIMarine.IsCanalTile(tile)) return false;
-		if (AIMarine.IsLockTile(tile)) return false;
-		return true;
-	}
-
-	function IsSeaTile(tile)
-	{
-		if (!AITile.IsWaterTile(tile)) return false;
-		if (AITile.GetMaxHeight(tile) > 0) return false;
-		if (AIMarine.IsWaterDepotTile(tile)) return false;
-		if (AIMarine.IsCanalTile(tile)) return false;
-		if (AIMarine.IsLockTile(tile)) return false;
-		return true;
-	}
-
 	function BuildDocks(connection)
 	{
 		local water_tile1_exit = AIMap.TILE_INVALID;
@@ -131,7 +115,8 @@ class WaterAI extends AIController
 			water_tile1 = AIMap.TILE_INVALID;
 			water_tile1_next = AIMap.TILE_INVALID;
 			do {
-				water_tile1_exit = AIBase.RandRange(AIMap.GetMapSize());
+//				water_tile1_exit = AIBase.RandRange(AIMap.GetMapSize());
+				water_tile1_exit = this.rand.RandomRange(AIMap.GetMapSize());
 			} while (!(AITile.GetSlope(water_tile1_exit) == AITile.SLOPE_FLAT && (AITile.IsBuildable(water_tile1_exit) || AITile.IsWaterTile(water_tile1_exit) && !AIMarine.IsWaterDepotTile(water_tile1_exit) && !AIMarine.IsLockTile(water_tile1_exit))));
 
 			foreach (offset in offsets) {
@@ -204,7 +189,6 @@ class WaterAI extends AIController
 		} while (!success);
 
 		return [water_tile1, built];
-//		return [water_tile1, water_tile1_exit, built]
 	}
 
 	function BuildingDepotBlocksConnection(top_tile, bot_tile)
@@ -394,63 +378,6 @@ class WaterAI extends AIController
 		return false;
 	}
 
-	function BuildPathOld(path, connection)
-	{
-		local tile_list = AIList();
-
-		local prev = null;
-		local prevprev = null;
-		while (path != null) {
-			if (prevprev != null) {
-				if (AIMap.DistanceManhattan(prev, path.GetTile()) > 1 || CanalPathFinder()._CheckAqueductSlopes(prev, path.GetTile())) {
-					if (AIMap.DistanceManhattan(prev, path.GetTile()) == 2 && AITile.GetSlope(prev) == AITile.SLOPE_FLAT && AITile.GetSlope(path.GetTile()) == AITile.SLOPE_FLAT) {
-						local next_tile = prev - (prev - path.GetTile()) / 2;
-						AISign.BuildSign(next_tile, connection.tostring());
-						if (!AITile.HasTransportType(prev, AITile.TRANSPORT_WATER)) {
-							if (/*AITestMode() && */AIMarine.BuildLock(next_tile)) {
-//								AILog.Info("Built lock at " + next_tile);
-							} else {
-//								AILog.Warning("Failed lock at " + next_tile);
-							}
-						}
-					} else {
-						AISign.BuildSign(prev, connection.tostring());
-						AISign.BuildSign(path.GetTile(), connection.tostring());
-						if (!AITile.HasTransportType(prev, AITile.TRANSPORT_WATER)) {
-							if (/*AITestMode() && */AIBridge.BuildBridge(AIVehicle.VT_WATER, 0, prev, path.GetTile())) {
-//								AILog.Info("Built aqueduct at " + prev + " and " + path.GetTile());
-							} else {
-//								AILog.Warning("Failed aqueduct at " + prev + " and " + path.GetTile());
-							}
-						}
-					}
-					prevprev = prev;
-					prev = path.GetTile();
-					path = path.GetParent();
-				} else {
-					if (!AITile.HasTransportType(prev, AITile.TRANSPORT_WATER)) {
-						AISign.BuildSign(prev, connection.tostring());
-						if (/*AITestMode() && */AIMarine.BuildCanal(prev)) {
-//							AILog.Info("Built canal at " + prev);
-						} else {
-//							AILog.Warning("Failed canal at " + prev);
-						}
-					}
-					tile_list.AddItem(prev, path.GetTile());
-				}
-			}
-			if (path != null) {
-				prevprev = prev;
-				prev = path.GetTile();
-				path = path.GetParent();
-			}
-		}
-		AILog.Warning("Placed " + connection + " signs");
-
-		return tile_list;
-	}
-
-
 	function BuildPath(path, connection)
 	{
 		local tile_list = AIList();
@@ -507,5 +434,36 @@ class WaterAI extends AIController
 		AILog.Warning("Placed " + connection + " signs");
 
 		return tile_list;
+	}
+}
+
+class Rand
+{
+	state = {};
+	
+	constructor()
+	{
+		this.state[0] <- (AIGameSettings.GetValue("generation_seed") + ROR(AIGameSettings.GetValue("generation_seed") ^ 0x1234567F, 7) + 1) & 0xFFFFFFFF;
+		this.state[1] <- (ROR(AIGameSettings.GetValue("generation_seed"), 3) - 1) & 0xFFFFFFFF;
+	}
+	
+	function Next() {
+		local s = this.state[0];
+		local t = this.state[1];
+		this.state[0] = (s + ROR(t ^ 0x1234567F, 7) + 1) & 0xFFFFFFFF;
+		return this.state[1] = (ROR(s, 3) - 1) & 0xFFFFFFFF;
+	}
+	
+	function ROR(x, n) {
+		if (n == 0) return x;
+		return (x >> n | x << (32 - n));
+	}
+	
+	function RandomRange(limit) {
+		return this.NextLimit(limit);
+	}
+	
+	function NextLimit(limit) {
+		return (this.Next() * limit) >> 32;
 	}
 }
