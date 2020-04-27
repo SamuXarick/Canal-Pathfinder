@@ -332,11 +332,11 @@ function Canal::_Neighbours(self, path, cur_node)
 		local other_end = path._prev._tile;
 		local next_tile = cur_node + (cur_node - other_end) / AIMap.DistanceManhattan(cur_node, other_end);
 		if (self._IsGoalTile(next_tile) || AIMarine.AreWaterTilesConnected(cur_node, next_tile) || AIMarine.BuildCanal(next_tile) || self._CanBuildAqueduct(cur_node, next_tile) || AITile.HasTransportType(next_tile, AITile.TRANSPORT_WATER) && (!AITile.IsWaterTile(next_tile) || AIMarine.IsCanalTile(next_tile) || self._IsLockEntryExit(next_tile) && self._CanConnectToLock(cur_node, next_tile) || AIMarine.IsWaterDepotTile(next_tile) && self._CanConnectToDepot(cur_node, next_tile))) {
-//			if (self._CheckPathForUsedTiles(path, self._GetUsedTiles(cur_node, other_end, true))) {
+			if (self._CheckPathForUsedTiles(path, self._GetUsedTiles(cur_node, other_end, true))) {
 				tiles.push([next_tile, self._GetDirection(cur_node, next_tile, true)/*, AIList() self._GetUsedTiles(cur_node, other_end, true)*/]);
 //				AILog.Info(cur_node + "; 2. Aqueduct detected, pushed next_tile = " + next_tile + "; parent_tile = " + path._prev._tile);
 //				AIController.Sleep(74);
-//			}
+			}
 		}
 	} else {
 		/* Check all tiles adjacent to the current tile. */
