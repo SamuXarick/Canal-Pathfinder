@@ -438,7 +438,7 @@ function Canal::_GetDirection(from, to)
 {
 	switch (from - to) {
 		case 1: return 1;                 // NE
-	    case -1: return 2;                // SW
+		case -1: return 2;                // SW
 		case this._map_size_x: return 4;  // SE
 		case -this._map_size_x: return 8; // NW
 		default: throw("Shouldn't come here in _GetDirection");
