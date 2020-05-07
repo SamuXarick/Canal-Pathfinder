@@ -759,7 +759,6 @@ function Canal::_IsLockEntryExit(tile)
 	return AIMarine.IsLockTile(tile) && this._IsFlatTile(tile);
 }
 
-
 /**
  * Get the tile of the middle part of a lock.
  * @param tile The tile of a part of a lock.
@@ -944,7 +943,6 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 
 	return false;
 }
-
 
 /**
  * Checks whether a previously planned lock blocks a ship traversable connection
