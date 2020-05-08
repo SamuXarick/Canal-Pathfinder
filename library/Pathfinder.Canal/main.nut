@@ -439,8 +439,8 @@ function Canal::_GetDirection(from, to)
 	switch (from - to) {
 		case 1: return 1;                 // NE
 		case -1: return 2;                // SW
-		case this._map_size_x: return 4;  // SE
-		case -this._map_size_x: return 8; // NW
+		case this._map_size_x: return 4;  // NW
+		case -this._map_size_x: return 8; // SE
 		default: throw("Shouldn't come here in _GetDirection");
 	}
 }
@@ -674,7 +674,7 @@ function Canal::_IsAqueductTile(tile)
 /**
  * Get the (other) end tile of a chain of traversable ship depots.
  * @param tile 1) One of the depot tiles where to start the check, or
- *  2) The southern end tile of a chain of depots.
+ *  2) The southern end tile of a chain of ship depots.
  * @return 1) The southern end tile of a chain of ship depots, or
  *  2) The northern end tile of a chain of ship depots.
  */
@@ -980,6 +980,7 @@ function Canal::_PreviousLockBlocksConnection(prev_lock, new_lock)
  *  existing entrance of a lock.
  * @param prev_tile The tile we're coming from.
  * @param lock_tile The entrance tile of the lock.
+ * @return true if the previous tile connects with the entrance of a lock.
  */
 function Canal::_CanConnectToLock(prev_tile, lock_tile)
 {
@@ -1009,7 +1010,7 @@ function Canal::_IsWaterDockTile(tile)
 /**
  * Get the tile where ships can use to dock at the given dock.
  * @param dock_tile A tile that is part of the dock.
- * @return the tile where ships dock at the given dock.
+ * @return The tile where ships dock at the given dock.
  */
 function Canal::_GetDockDockingTile(dock_tile)
 {
@@ -1040,6 +1041,11 @@ function Canal::_GetDockDockingTile(dock_tile)
 	}
 }
 
+/**
+ * Check whether a tile is a destination tile for the path.
+ * @param tile The tile to check.
+ * @return true if the tile is a destination for the path.
+ */
 function Canal::_IsGoalTile(tile)
 {
 	foreach (goal in this._goals) {
@@ -1051,17 +1057,32 @@ function Canal::_IsGoalTile(tile)
 	return false;
 }
 
+/**
+ * Check whether a tile has an inclined slope.
+ * @param tile The tile to check.
+ * @return true if the tile has an inclined slope.
+ */
 function Canal::_IsInclinedTile(tile)
 {
 	local slope = AITile.GetSlope(tile);
 	return slope == AITile.SLOPE_SW || slope == AITile.SLOPE_NW || slope == AITile.SLOPE_SE || slope == AITile.SLOPE_NE;
 }
 
+/**
+ * Check whether a tile is flat.
+ * @param tile The tile to check.
+ * @return true if the tile is flat.
+ */
 function Canal::_IsFlatTile(tile)
 {
 	return AITile.GetSlope(tile) == AITile.SLOPE_FLAT;
 }
 
+/**
+ * Check whether a tile has one corner raised.
+ * @param tile The tile to check.
+ * @return true if the tile has one corner raised.
+ */
 function Canal::_IsOneCornerRaisedTile(tile)
 {
 	local slope = AITile.GetSlope(tile);
