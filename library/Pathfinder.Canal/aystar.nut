@@ -13,11 +13,11 @@
  *  - _used_tiles is added. It works as a cumulative cache, consisting of an array of used tiles
  *    up to the current point in the path. Improves performance in relation to the Graph.AyStar 6
  *    compatible version, which requires to walk the path backwards each time, to recompute them.
- *    Costs a small portion of memory.
+ *    Requires a small portion of memory.
  *  - _path_tiles is added. It works as a cumulative cache, consisting of an array of tiles that
  *    the path consists off, from the beginning up to the current point in the path. Improves
  *    performance of AyStar class when checking for a possible collision, which requires to walk
- *    the path backwards.
+ *    the path backwards. Requires a large portion of memory.
  */
 class AyStar
 {
