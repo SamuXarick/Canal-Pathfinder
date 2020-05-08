@@ -1,6 +1,23 @@
 /**
  * An AyStar implementation.
  *  It solves graphs by finding the fastest route from one point to the other.
+ *
+ *  AyStar differences to Graph.AyStar 6:
+ *  - Uses a different, faster queue.
+ *  - Source tiles are an array of tiles in the form [tile, direction, used_tiles].
+ *    The used_tiles is added, and is another array of tiles in the form [tile, bitmask].
+ *  - Goal tiles are a simple array of tiles, no longer in the form [tile, next_tile], just 'tile'.
+ *
+ *  AyStar.Path differences to Graph.AyStar 6:
+ *  - _length is removed for improved performance.
+ *  - _used_tiles is added. It works as a cumulative cache, consisting of an array of used tiles
+ *    up to the current point in the path. Improves performance in relation to the Graph.AyStar 6
+ *    compatible version, which requires to walk the path backwards each time, to recompute them.
+ *    Costs a small portion of memory.
+ *  - _path_tiles is added. It works as a cumulative cache, consisting of an array of tiles that
+ *    the path consists off, from the beginning up to the current point in the path. Improves
+ *    performance of AyStar class when checking for a possible collision, which requires to walk
+ *    the path backwards.
  */
 class AyStar
 {
@@ -32,7 +49,7 @@ class AyStar
 	 * @param neighbours_callback A function that returns all neighbouring nodes
 	 *  from a given node. It should accept three parameters, current_path, node
 	 *  and neighbours_callback_param. It should return an array containing all
-	 *  neighbouring nodes, which are an array in the form [tile, direction].
+	 *  neighbouring nodes, which are an array in the form [tile, direction, used_tiles].
 	 * @param check_direction_callback A function that returns either false or
 	 *  true. It should accept four parameters, tile, existing_direction,
 	 *  new_direction and check_direction_callback_param. It should check
@@ -55,7 +72,7 @@ class AyStar
 
 	/**
 	 * Initialize a path search between sources and goals.
-	 * @param sources The source nodes. This can be an array of either [tile, direction, used_tiles]-pairs or AyStar.Path-instances.
+	 * @param sources The source nodes. This can be an array in the form of [tile, direction, used_tiles] or AyStar.Path-instances.
 	 * @param goals The target tiles. This must be an array of tiles.
 	 * @param ignored_tiles An array of tiles that cannot occur in the final path.
 	 */
@@ -146,7 +163,6 @@ function AyStar::FindPath(iterations)
 			if (node[1] <= 0) throw("directional value should never be zero or negative.");
 
 			if (this._closed.GetValue(node[0]) & node[1]) continue;
-
 			/* Calculate the new paths and add them to the open list */
 			local new_path = this.Path(path, node[0], node[1], node[2], this._cost_callback, this._pf_instance);
 			this._open.Insert(new_path, new_path._cost + this._estimate_callback(this._pf_instance, node[0], node[1], this._goals));
@@ -177,24 +193,18 @@ class AyStar.Path
 	_tile = null;
 	_direction = null;
 	_cost = null;
-	_length = null;
 	_used_tiles = null;
 	_path_tiles = null;
 
-	constructor(old_path, new_tile, new_direction, used_tiles, cost_callback, pf_instance)
+	constructor(old_path, new_tile, new_direction, new_used_tiles, cost_callback, pf_instance)
 	{
 		this._prev = old_path;
 		this._tile = new_tile;
 		this._direction = new_direction;
 		this._cost = cost_callback(pf_instance, old_path, new_tile, new_direction);
-		if (old_path == null) {
-			this._length = 0;
-		} else {
-			this._length = old_path._length + AIMap.DistanceManhattan(old_path._tile, new_tile);
-		}
 		this._used_tiles = [];
 		if (old_path != null) this._used_tiles.extend(old_path._used_tiles);
-		this._used_tiles.extend(used_tiles);
+		this._used_tiles.extend(new_used_tiles);
 		this._path_tiles = [];
 		if (old_path != null) this._path_tiles.extend(old_path._path_tiles);
 		this._path_tiles.append(new_tile);
@@ -206,11 +216,6 @@ class AyStar.Path
 	function GetTile() { return this._tile; }
 
 	/**
-	 * Return the direction from which we entered the tile in this (partial-)path.
-	 */
-	function GetDirection() { return this._direction; }
-
-	/**
 	 * Return an instance of this class leading to the previous node.
 	 */
 	function GetParent() { return this._prev; }
@@ -219,9 +224,4 @@ class AyStar.Path
 	 * Return the cost of this (partial-)path from the beginning up to this node.
 	 */
 	function GetCost() { return this._cost; }
-	
-	/**
-	 * Return the length (in tiles) of this path.
-	 */
-	function GetLength() { return this._length; }
 };
