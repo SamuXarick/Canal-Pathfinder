@@ -3,8 +3,8 @@ class Canal extends AILibrary {
 	function GetName()        { return "Canal"; }
 	function GetShortName()   { return "PFCL"; }
 	function GetDescription() { return "An implementation of a canal pathfinder"; }
-	function GetVersion()     { return 1; }
-	function GetDate()        { return "2020-04-12"; }
+	function GetVersion()     { return 2; }
+	function GetDate()        { return "2020-05-08"; }
 	function CreateInstance() { return "Canal"; }
 	function GetCategory()    { return "Pathfinder"; }
 }
