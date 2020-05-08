@@ -293,9 +293,11 @@ function Canal::_Estimate(self, cur_tile, cur_direction, goal_tiles)
 	local min_cost = self._max_cost;
 	/* As estimate we multiply the lowest possible cost for a single tile
 	 *  with the minimum number of tiles we need to traverse. */
+	local cur_tile_x = AIMap.GetTileX(cur_tile);
+	local cur_tile_y = AIMap.GetTileY(cur_tile); 
 	foreach (tile in goal_tiles) {
-		local dx = abs(AIMap.GetTileX(cur_tile) - AIMap.GetTileX(tile));
-		local dy = abs(AIMap.GetTileY(cur_tile) - AIMap.GetTileY(tile));
+		local dx = abs(cur_tile_x - AIMap.GetTileX(tile));
+		local dy = abs(cur_tile_y - AIMap.GetTileY(tile));
 		min_cost = min(min_cost, min(dx, dy) * self._cost_diagonal_tile * 2 + (max(dx, dy) - min(dx, dy)) * self._cost_tile);
 	}
 	return min_cost * self._estimate_multiplier;
