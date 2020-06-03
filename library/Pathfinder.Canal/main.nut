@@ -383,7 +383,7 @@ function Canal::_Neighbours(self, path, cur_node)
 			 * 2) We can build a canal to the next tile.
 			 * 3) The next tile is the entrance of an aqueduct, depot or lock in the correct direction. */
 			if ((prev == null || AIMarine.AreWaterTilesConnected(prev_node, cur_node) || AIMarine.BuildCanal(cur_node) || AITile.HasTransportType(cur_node, AITile.TRANSPORT_WATER)) &&
-					(self._IsGoalTile(next_tile) || AIMarine.AreWaterTilesConnected(cur_node, next_tile) && (!self._IsAqueductTile(next_tile) || self._CanConnectToAqueduct(cur_node, next_tile)) || AIMarine.BuildCanal(next_tile) || self._CanBuildAqueduct(cur_node, next_tile) || AITile.HasTransportType(next_tile, AITile.TRANSPORT_WATER) && (!AITile.IsWaterTile(next_tile) && !AITile.IsCoastTile(next_tile) && !self._IsAqueductTile(next_tile) || AIMarine.IsCanalTile(next_tile) || self._IsLockEntryExit(next_tile) && self._CanConnectToLock(cur_node, next_tile) || AIMarine.IsWaterDepotTile(next_tile) && self._CanConnectToDepot(cur_node, next_tile) || self._IsAqueductTile(next_tile) && self._CanConnectToAqueduct(cur_node, next_tile)))) {
+					(self._IsGoalTile(next_tile) || AIMarine.AreWaterTilesConnected(cur_node, next_tile) || AIMarine.BuildCanal(next_tile) || self._CanBuildAqueduct(cur_node, next_tile) || AITile.HasTransportType(next_tile, AITile.TRANSPORT_WATER) && (!AITile.IsWaterTile(next_tile) && !AITile.IsCoastTile(next_tile) && !self._IsAqueductTile(next_tile) || AIMarine.IsCanalTile(next_tile) || self._IsLockEntryExit(next_tile) && self._CanConnectToLock(cur_node, next_tile) || AIMarine.IsWaterDepotTile(next_tile) && self._CanConnectToDepot(cur_node, next_tile) || self._IsAqueductTile(next_tile) && self._CanConnectToAqueduct(cur_node, next_tile)))) {
 				tiles.push([next_tile, self._GetDirection(cur_node, next_tile), []]);
 //				AILog.Info(cur_node + "; 3. Build Canal, pushed next_tile = " + next_tile + "; parent_tile = " + (prev == null ? "null" : prev_node));
 //				AIController.Sleep(74);
@@ -854,7 +854,7 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 	local t_2mp = t_mp + offset_mid;
 	local t_2mp_sp = t_2mp + offset_side;
 	local t_2mp_sn = t_2mp - offset_side;
-	if (AIMarine.AreWaterTilesConnected(t_mp, t_2mp) || this._IsAqueductTile(t_2mp) && this._CanConnectToAqueduct(t_mp, t_2mp)) {
+	if (AIMarine.AreWaterTilesConnected(t_mp, t_2mp)) {
 		if (AIMarine.AreWaterTilesConnected(t_mp, t_mp_sp)) {
 			if (!AIMarine.AreWaterTilesConnected(t_2mp_sp, t_mp_sp) || !AIMarine.AreWaterTilesConnected(t_2mp_sp, t_2mp)) return true;
 		}
@@ -880,7 +880,7 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 	local t_2mn = t_mn - offset_mid;
 	local t_2mn_sp = t_2mn + offset_side;
 	local t_2mn_sn = t_2mn - offset_side;
-	if (AIMarine.AreWaterTilesConnected(t_mn, t_2mn) || this._IsAqueductTile(t_2mn) && this._CanConnectToAqueduct(t_mn, t_2mn)) {
+	if (AIMarine.AreWaterTilesConnected(t_mn, t_2mn)) {
 		if (AIMarine.AreWaterTilesConnected(t_mn, t_mn_sp)) {
 			if (!AIMarine.AreWaterTilesConnected(t_2mn_sp, t_mn_sp) || !AIMarine.AreWaterTilesConnected(t_2mn_sp, t_2mn)) return true;
 		}
