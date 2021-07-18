@@ -861,6 +861,8 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 		if (AIMarine.AreWaterTilesConnected(t_mp, t_mp_sn)) {
 			if (!AIMarine.AreWaterTilesConnected(t_2mp_sn, t_mp_sn) || !AIMarine.AreWaterTilesConnected(t_2mp_sn, t_2mp)) return true;
 		}
+	} else {
+		if (this._IsWaterDockTile(t_2mp) && this._GetDockDockingTile(t_2mp) != t_mp) return true;
 	}
 
 	if (AIMarine.AreWaterTilesConnected(t_mp, t_mp_sp) && AIMarine.AreWaterTilesConnected(t_mp, t_mp_sn)) {
@@ -885,6 +887,8 @@ function Canal::_LockBlocksConnection(prev_tile, middle_tile)
 		if (AIMarine.AreWaterTilesConnected(t_mn, t_mn_sn)) {
 			if (!AIMarine.AreWaterTilesConnected(t_2mn_sn, t_mn_sn) || !AIMarine.AreWaterTilesConnected(t_2mn_sn, t_2mn)) return true;
 		}
+	} else {
+		if (this._IsWaterDockTile(t_2mn) && this._GetDockDockingTile(t_2mn) != t_mn) return true;
 	}
 
 	if (AIMarine.AreWaterTilesConnected(t_mn, t_mn_sp) && AIMarine.AreWaterTilesConnected(t_mn, t_mn_sn)) {
