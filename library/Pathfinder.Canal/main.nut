@@ -32,6 +32,16 @@ class Canal
 	_cost_depot = null;             ///< The cost for an existing depot, this is added to _cost_tile.
 	_max_aqueduct_length = null;    ///< The maximum length of an aqueduct that will be build.
 	_estimate_multiplier = null;    ///< Every estimate is multiplied by this value. Use 1 for a 'perfect' route, higher values for faster pathfinding.
+	_search_range = null;           ///< Range to search around source and destination, in either coordinate. 0 indicates unlimited.
+
+	_a = null;
+	_b = null;
+	_c = null;
+	_sqrt = null;
+	_min_x = null;
+	_max_x = null;
+	_min_y = null;
+	_max_y = null;
 
 	/* Useful constants */
 	_offsets = [AIMap.GetMapSizeX(), -AIMap.GetMapSizeX(), 1, -1];
@@ -55,6 +65,7 @@ class Canal
 		this._cost_depot = 150;
 		this._max_aqueduct_length = 6;
 		this._estimate_multiplier = 1;
+		this._search_range = 0;
 	}
 
 	/**
@@ -70,6 +81,42 @@ class Canal
 			nsources.push([node, 0xFF, []]);
 		}
 		this._pathfinder.InitializePath(nsources, goals, ignored_tiles);
+		if (this._search_range) {
+			local pair = [];
+			local min_freeform = AIMap.IsValidTile(0) ? 0 : 1;
+			local max_freeform = min_freeform == 0 ? 3 : 2;
+			foreach (source in sources) {
+				foreach (goal in goals) {
+					local distance = AIMap.DistanceManhattan(source, goal);
+					pair.append([source, goal, distance]);
+
+					local source_x = AIMap.GetTileX(source);
+					local source_y = AIMap.GetTileY(source);
+					local goal_x = AIMap.GetTileX(goal);
+					local goal_y = AIMap.GetTileY(goal);
+
+					this._min_x = max(min_freeform, min(source_x, goal_x) - this._search_range);
+					this._min_y = max(min_freeform, min(source_y, goal_y) - this._search_range);
+					this._max_x = min(AIMap.GetMapSizeX() - max_freeform, max(source_x, goal_x) + this._search_range);
+					this._max_y = min(AIMap.GetMapSizeY() - max_freeform, max(source_y, goal_y) + this._search_range);
+				}
+			}
+
+			local best_distance = this._map_size;;
+			local best_source = AIMap.TILE_INVALID;
+			local best_goal = AIMap.TILE_INVALID;
+			for (local i = 0; i < pair.len(); i++) {
+				if (pair[i][2] < best_distance) {
+					best_distance = pair[i][2];
+					best_source = pair[i][0];
+					best_goal = pair[i][1];
+				}
+			}
+			this._a = AIMap.GetTileY(best_source) - AIMap.GetTileY(best_goal);
+			this._b = AIMap.GetTileX(best_goal) - AIMap.GetTileX(best_source);
+			this._c = AIMap.GetTileX(best_source) * AIMap.GetTileY(best_goal) - AIMap.GetTileX(best_goal) * AIMap.GetTileY(best_source);
+			this._sqrt = sqrt(this._a * this._a + this._b * this._b);
+		}
 	}
 
 	/**
@@ -106,6 +153,7 @@ class Canal.Cost
 			case "depot":               this._main._cost_depot = val; break;
 			case "max_aqueduct_length": this._main._max_aqueduct_length = val; break;
 			case "estimate_multiplier": this._main._estimate_multiplier = val; break;
+			case "search_range":        this._main._search_range = val; break;
 			default: throw("the index '" + idx + "' does not exist");
 		}
 
@@ -126,6 +174,7 @@ class Canal.Cost
 			case "depot":               return this._main._cost_depot;
 			case "max_aqueduct_length": return this._main._max_aqueduct_length;
 			case "estimate_multiplier": return this._main._estimate_multiplier;
+			case "search_range":        return this._main._search_range;
 			default: throw("the index '" + idx + "' does not exist");
 		}
 	}
@@ -148,6 +197,13 @@ function Canal::_Cost(self, path, new_tile, new_direction)
 {
 	/* path == null means this is the first node of a path, so the cost is 0. */
 	if (path == null) return 0;
+
+	if (self._search_range) {
+		local cur_tile_x = AIMap.GetTileX(new_tile);
+		local cur_tile_y = AIMap.GetTileY(new_tile);
+		if (cur_tile_x < self._min_x || cur_tile_x > self._max_x || cur_tile_y < self._min_y || cur_tile_y > self._max_y) return path._cost += self._max_cost;
+		if (abs(self._a * cur_tile_x + self._b * cur_tile_y + self._c) / self._sqrt > self._search_range) return path._cost += self._max_cost;
+	}
 
 	local prev_tile = path._tile;
 	local path_prev = path._prev;
@@ -285,7 +341,7 @@ function Canal::_Estimate(self, cur_tile, cur_direction, goal_tiles)
 	/* As estimate we multiply the lowest possible cost for a single tile
 	 *  with the minimum number of tiles we need to traverse. */
 	local cur_tile_x = AIMap.GetTileX(cur_tile);
-	local cur_tile_y = AIMap.GetTileY(cur_tile); 
+	local cur_tile_y = AIMap.GetTileY(cur_tile);
 	foreach (tile in goal_tiles) {
 		local dx = abs(cur_tile_x - AIMap.GetTileX(tile));
 		local dy = abs(cur_tile_y - AIMap.GetTileY(tile));
